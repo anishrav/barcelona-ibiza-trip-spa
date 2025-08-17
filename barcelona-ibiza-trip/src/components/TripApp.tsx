@@ -34,6 +34,7 @@ import {
   Plus,
   Image,
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 // ----------------------------
 // Types
@@ -69,26 +70,12 @@ type TripData = {
   lodging: { barcelona: Lodging; ibiza: Lodging };
   schedule: ScheduleItem[];
   flights: Flight[];
-  photos: string[]; // data URLs stored in localStorage
+  photos: string[];
 };
 
 // ----------------------------
 // Helpers
 // ----------------------------
-
-const KEY = "trip-barcelona-ibiza-v3";
-
-function save(data: TripData) {
-  localStorage.setItem(KEY, JSON.stringify(data));
-}
-function load(): TripData | null {
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as TripData) : null;
-  } catch {
-    return null;
-  }
-}
 
 function mapLink(address: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -144,175 +131,8 @@ const defaultData: TripData = {
         "Carrer del Pica-Soques, 34, 07817 Sant Josep de sa Talaia, Illes Balears, Spain",
     },
   },
-  schedule: [
-    // Barcelona
-    {
-      id: uid("sch"),
-      date: "2025-08-30",
-      title: "Night out (drinks)",
-      area: "Barcelona",
-      notes: "Evening",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-08-31",
-      time: "15:15",
-      title: "Sagrada Família Tour",
-      area: "Barcelona",
-      location: "Sagrada Família",
-      address: "Carrer de Mallorca, 401, 08013 Barcelona, Spain",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-08-31",
-      time: "17:00",
-      title: "Fantasy Football Draft",
-      area: "Barcelona",
-      location: "Barcelona Airbnb",
-      address: "Pg. de Gràcia, 65, L'Eixample, 08008 Barcelona, Spain",
-      url: "https://www.airbnb.com/l/ORgNzpnP?s=67&unique_share_id=38225666-7311-4745-ad81-1de9cc3e6db1",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-08-31",
-      time: "20:00",
-      title: "Watch FC Barcelona match at a bar",
-      area: "Barcelona",
-      location: "Bar (TBD)",
-      notes: "After fantasy draft",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-01",
-      time: "16:00",
-      title: "Paella Cooking Class",
-      area: "Barcelona",
-      location: "Cooking Class",
-      address: "Carrer de Negrevernís, 30, 08034 Barcelona, Catalonia, Spain",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-01",
-      time: "21:30",
-      title: "Flamenco Show @ 23 Robadors",
-      area: "Barcelona",
-      location: "23 Robadors",
-      address: "Carrer d'en Robador, 23, 08001 Barcelona, Spain",
-      url: "https://23robadors.com/",
-      notes: "Programació flamenco — confirm start time on site",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-02",
-      time: "13:30",
-      title: "Sailing",
-      area: "Barcelona",
-      location: "Marina",
-      address: "Passeig de Joan de Borbó, 103, 08039 Barcelona, Catalonia, Spain",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-02",
-      time: "20:15",
-      title: "Dinner: Bacaro",
-      area: "Barcelona",
-      address: "Carrer de Jerusalem, 6, 08001 Barcelona",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-02",
-      time: "22:30",
-      title: "Drinks after dinner",
-      area: "Barcelona",
-      notes: "After Bacaro, late",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-03",
-      time: "10:00",
-      title: "Commute to BCN Airport",
-      area: "Barcelona",
-      location: "Barcelona–El Prat (BCN)",
-      address:
-        "Aeropuerto de Barcelona-El Prat, 08820 El Prat de Llobregat, Barcelona, Spain",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-03",
-      time: "12:30",
-      title: "Flight: Barcelona → Ibiza (FR3129)",
-      area: "Barcelona",
-      notes: "Arrive 13:40",
-    },
-
-    // Ibiza
-    {
-      id: uid("sch"),
-      date: "2025-09-04",
-      title: "Dinner: Ohana Ibiza",
-      area: "Ibiza",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-05",
-      time: "17:00",
-      title: "Calvin Harris @ Ushuaïa",
-      area: "Ibiza",
-      notes: "5–11 pm",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-05",
-      time: "23:30",
-      title: "David Guetta @ UNVRS",
-      area: "Ibiza",
-      notes: "11:30 pm – sunrise",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-06",
-      title: "Chill day",
-      area: "Ibiza",
-    },
-    {
-      id: uid("sch"),
-      date: "2025-09-07",
-      title: "Fly out",
-      area: "Ibiza",
-    },
-  ],
-  flights: [
-    {
-      id: uid("flt"),
-      traveler: "Anish + Sinha",
-      from: "USA",
-      to: "Barcelona",
-      flight: "DL 128",
-      date: "2025-08-30",
-      arriveTime: "06:00",
-      notes: "Arrive 6:00 am",
-    },
-    {
-      id: uid("flt"),
-      traveler: "Group",
-      from: "Barcelona",
-      to: "Ibiza",
-      flight: "FR 3129",
-      date: "2025-09-03",
-      departTime: "12:30",
-      arriveTime: "13:40",
-      notes: "Ryanair",
-    },
-    {
-      id: uid("flt"),
-      traveler: "Group",
-      from: "Ibiza",
-      to: "Home",
-      flight: "TBD",
-      date: "2025-09-07",
-      notes: "Add details",
-    },
-  ],
+  schedule: [],
+  flights: [],
   photos: [],
 };
 
@@ -372,15 +192,39 @@ function Badge({ area }: { area: "Barcelona" | "Ibiza" }) {
 // ----------------------------
 
 export default function TripApp() {
-  const [data, setData] = useState<TripData>(() => load() ?? defaultData);
+  const [data, setData] = useState<TripData>(defaultData);
   const [areaFilter, setAreaFilter] = useState<"All" | "Barcelona" | "Ibiza">(
     "All"
   );
   const [showAddresses, setShowAddresses] = useState(true);
 
   useEffect(() => {
-    save(data);
-  }, [data]);
+    async function loadData() {
+      const { data: sched } = await supabase
+        .from("schedule")
+        .select()
+        .order("date");
+      const { data: flts } = await supabase
+        .from("flights")
+        .select()
+        .order("date");
+      const { data: files } = await supabase.storage
+        .from("trip-photos")
+        .list("", { limit: 100 });
+      const photos =
+        files?.map((f) =>
+          supabase.storage.from("trip-photos").getPublicUrl(f.name).data
+            .publicUrl
+        ) ?? [];
+      setData((d) => ({
+        ...d,
+        schedule: (sched as ScheduleItem[]) || [],
+        flights: (flts as Flight[]) || [],
+        photos,
+      }));
+    }
+    loadData();
+  }, []);
 
   const scheduleSorted = useMemo(() => {
     const base = [...data.schedule].sort(byDateTime);
@@ -394,45 +238,37 @@ export default function TripApp() {
     [scheduleSorted]
   );
 
-  function addSchedule(it: Omit<ScheduleItem, "id">) {
-    setData((d) => ({
-      ...d,
-      schedule: [...d.schedule, { ...it, id: uid("sch") }],
-    }));
+  async function addSchedule(it: Omit<ScheduleItem, "id">) {
+    const item: ScheduleItem = { ...it, id: uid("sch") };
+    const { error } = await supabase.from("schedule").insert(item);
+    if (!error) {
+      setData((d) => ({ ...d, schedule: [...d.schedule, item] }));
+    }
   }
-  function deleteSchedule(id: string) {
-    setData((d) => ({
-      ...d,
-      schedule: d.schedule.filter((x) => x.id !== id),
-    }));
+  async function addFlight(f: Omit<Flight, "id">) {
+    const item: Flight = { ...f, id: uid("flt") };
+    const { error } = await supabase.from("flights").insert(item);
+    if (!error) {
+      setData((d) => ({ ...d, flights: [...d.flights, item] }));
+    }
   }
-
-  function addFlight(f: Omit<Flight, "id">) {
-    setData((d) => ({
-      ...d,
-      flights: [...d.flights, { ...f, id: uid("flt") }],
-    }));
-  }
-  function deleteFlight(id: string) {
-    setData((d) => ({
-      ...d,
-      flights: d.flights.filter((x) => x.id !== id),
-    }));
-  }
-
-  function handlePhotoUpload(files: FileList | null) {
+  async function handlePhotoUpload(files: FileList | null) {
     if (!files || !files.length) return;
-    const promises = Array.from(files).map(
-      (file) =>
-        new Promise<string>((resolve) => {
-          const r = new FileReader();
-          r.onload = () => resolve(r.result as string);
-          r.readAsDataURL(file);
-        })
+    const uploads = await Promise.all(
+      Array.from(files).map(async (file) => {
+        const filePath = `${uid("photo")}-${file.name}`;
+        const { error } = await supabase.storage
+          .from("trip-photos")
+          .upload(filePath, file);
+        if (error) return null;
+        return supabase.storage.from("trip-photos").getPublicUrl(filePath).data
+          .publicUrl;
+      })
     );
-    Promise.all(promises).then((urls) =>
-      setData((d) => ({ ...d, photos: [...d.photos, ...urls] }))
-    );
+    setData((d) => ({
+      ...d,
+      photos: [...d.photos, ...uploads.filter(Boolean) as string[]],
+    }));
   }
 
   return (
@@ -585,15 +421,6 @@ export default function TripApp() {
                               </div>
                             ) : null}
                           </div>
-                          <div className="flex items-center gap-2 self-end md:self-center">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteSchedule(it.id)}
-                            >
-                              Remove
-                            </Button>
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -720,7 +547,6 @@ export default function TripApp() {
                         <th className="p-3">Dep</th>
                         <th className="p-3">Arr</th>
                         <th className="p-3">Notes</th>
-                        <th className="p-3"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -738,15 +564,6 @@ export default function TripApp() {
                             {f.arriveTime ?? "—"}
                           </td>
                           <td className="p-3">{f.notes ?? ""}</td>
-                          <td className="p-3 text-right">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => deleteFlight(f.id)}
-                            >
-                              Remove
-                            </Button>
-                          </td>
                         </tr>
                       ))}
                     </tbody>

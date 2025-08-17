@@ -1,0 +1,117 @@
+[
+  {
+    "date": "2025-08-30",
+    "title": "Night out (drinks)",
+    "area": "Barcelona",
+    "notes": "Evening"
+  },
+  {
+    "date": "2025-08-31",
+    "time": "15:15",
+    "title": "Sagrada Família Tour",
+    "area": "Barcelona",
+    "location": "Sagrada Família",
+    "address": "Carrer de Mallorca, 401, 08013 Barcelona, Spain"
+  },
+  {
+    "date": "2025-08-31",
+    "time": "17:00",
+    "title": "Fantasy Football Draft",
+    "area": "Barcelona",
+    "location": "Barcelona Airbnb",
+    "address": "Pg. de Gràcia, 65, L'Eixample, 08008 Barcelona, Spain",
+    "url": "https://www.airbnb.com/l/ORgNzpnP?s=67&unique_share_id=38225666-7311-4745-ad81-1de9cc3e6db1"
+  },
+  {
+    "date": "2025-08-31",
+    "time": "20:00",
+    "title": "Watch FC Barcelona match at a bar",
+    "area": "Barcelona",
+    "location": "Bar (TBD)",
+    "notes": "After fantasy draft"
+  },
+  {
+    "date": "2025-09-01",
+    "time": "16:00",
+    "title": "Paella Cooking Class",
+    "area": "Barcelona",
+    "location": "Cooking Class",
+    "address": "Carrer de Negrevernís, 30, 08034 Barcelona, Catalonia, Spain"
+  },
+  {
+    "date": "2025-09-01",
+    "time": "21:30",
+    "title": "Flamenco Show @ 23 Robadors",
+    "area": "Barcelona",
+    "location": "23 Robadors",
+    "address": "Carrer d'en Robador, 23, 08001 Barcelona, Spain",
+    "url": "https://23robadors.com/",
+    "notes": "Programació flamenco — confirm start time on site"
+  },
+  {
+    "date": "2025-09-02",
+    "time": "13:30",
+    "title": "Sailing",
+    "area": "Barcelona",
+    "location": "Marina",
+    "address": "Passeig de Joan de Borbó, 103, 08039 Barcelona, Catalonia, Spain"
+  },
+  {
+    "date": "2025-09-02",
+    "time": "20:15",
+    "title": "Dinner: Bacaro",
+    "area": "Barcelona",
+    "address": "Carrer de Jerusalem, 6, 08001 Barcelona"
+  },
+  {
+    "date": "2025-09-02",
+    "time": "22:30",
+    "title": "Drinks after dinner",
+    "area": "Barcelona",
+    "notes": "After Bacaro, late"
+  },
+  {
+    "date": "2025-09-03",
+    "time": "10:00",
+    "title": "Commute to BCN Airport",
+    "area": "Barcelona",
+    "location": "Barcelona–El Prat (BCN)",
+    "address": "Aeropuerto de Barcelona-El Prat, 08820 El Prat de Llobregat, Barcelona, Spain"
+  },
+  {
+    "date": "2025-09-03",
+    "time": "12:30",
+    "title": "Flight: Barcelona → Ibiza (FR3129)",
+    "area": "Barcelona",
+    "notes": "Arrive 13:40"
+  },
+  {
+    "date": "2025-09-04",
+    "title": "Dinner: Ohana Ibiza",
+    "area": "Ibiza"
+  },
+  {
+    "date": "2025-09-05",
+    "time": "17:00",
+    "title": "Calvin Harris @ Ushuaïa",
+    "area": "Ibiza",
+    "notes": "5–11 pm"
+  },
+  {
+    "date": "2025-09-05",
+    "time": "23:30",
+    "title": "David Guetta @ UNVRS",
+    "area": "Ibiza",
+    "notes": "11:30 pm – sunrise"
+  },
+  {
+    "date": "2025-09-06",
+    "title": "Chill day",
+    "area": "Ibiza"
+  },
+  {
+    "date": "2025-09-07",
+    "title": "Fly out",
+    "area": "Ibiza"
+  }
+]
