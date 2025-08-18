@@ -270,22 +270,31 @@ export default function TripApp() {
   }
   async function handlePhotoUpload(files: FileList | null) {
     if (!files || !files.length) return;
-    const uploads = await Promise.all(
+    const uploadedUrls: string[] = [];
+
+    await Promise.all(
       Array.from(files).map(async (file) => {
-        const filePath = `${uid("photo")}-${file.name}`;
-        const { error } = await supabase.storage
-          .from("trip-photos")
-          .upload(filePath, file);
-        if (error) return null;
-        return encodeURI(
-          supabase.storage.from("trip-photos").getPublicUrl(filePath).data
-            .publicUrl
-        );
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          // If the upload fails (e.g. missing Supabase config or RLS), fall back to a local preview
+          uploadedUrls.push(URL.createObjectURL(file));
+          return;
+        }
+
+        const { url } = await res.json();
+        uploadedUrls.push(url);
       })
     );
+
     setData((d) => ({
       ...d,
-      photos: [...d.photos, ...uploads.filter(Boolean) as string[]],
+      photos: [...d.photos, ...uploadedUrls],
     }));
   }
 
@@ -606,7 +615,11 @@ export default function TripApp() {
                     type="file"
                     multiple
                     accept="image/*"
-                    onChange={(e) => handlePhotoUpload(e.target.files)}
+                    onChange={async (e) => {
+                      await handlePhotoUpload(e.target.files);
+                      // Allow selecting the same file again later
+                      e.target.value = "";
+                    }}
                   />
                 </div>
               </CardHeader>
