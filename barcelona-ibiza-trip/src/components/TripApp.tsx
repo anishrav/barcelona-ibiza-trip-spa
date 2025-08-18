@@ -209,17 +209,9 @@ export default function TripApp() {
         .from("flights")
         .select()
         .order("date");
-      const { data: files } = await supabase.storage
-        .from("trip-photos")
-        .list("", { limit: 100 });
-      const photos =
-        files?.map(
-          (f) =>
-            encodeURI(
-              supabase.storage.from("trip-photos").getPublicUrl(f.name).data
-                .publicUrl
-            )
-        ) ?? [];
+      const photos = await fetch("/api/photos")
+        .then((r) => (r.ok ? r.json() : { photos: [] }))
+        .then((r) => r.photos as string[]);
       setData((d) => ({
         ...d,
         schedule: (sched as ScheduleItem[]) || [],
