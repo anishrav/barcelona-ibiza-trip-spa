@@ -174,7 +174,7 @@ function Row({
 }) {
   return (
     <div className="grid grid-cols-3 gap-3 items-center">
-      <Label className="text-sm text-muted-foreground">{label}</Label>
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
       <div className="col-span-2">{children}</div>
     </div>
   );
