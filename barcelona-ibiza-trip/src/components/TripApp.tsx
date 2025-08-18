@@ -33,6 +33,7 @@ import {
   Plane,
   Plus,
   Image,
+  Pencil,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -173,7 +174,7 @@ function Row({
 }) {
   return (
     <div className="grid grid-cols-3 gap-3 items-center">
-      <Label className="text-sm text-muted-foreground">{label}</Label>
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
       <div className="col-span-2">{children}</div>
     </div>
   );
@@ -212,9 +213,12 @@ export default function TripApp() {
         .from("trip-photos")
         .list("", { limit: 100 });
       const photos =
-        files?.map((f) =>
-          supabase.storage.from("trip-photos").getPublicUrl(f.name).data
-            .publicUrl
+        files?.map(
+          (f) =>
+            encodeURI(
+              supabase.storage.from("trip-photos").getPublicUrl(f.name).data
+                .publicUrl
+            )
         ) ?? [];
       setData((d) => ({
         ...d,
@@ -245,6 +249,18 @@ export default function TripApp() {
       setData((d) => ({ ...d, schedule: [...d.schedule, item] }));
     }
   }
+  async function updateSchedule(it: ScheduleItem) {
+    const { error } = await supabase
+      .from("schedule")
+      .update(it)
+      .eq("id", it.id);
+    if (!error) {
+      setData((d) => ({
+        ...d,
+        schedule: d.schedule.map((s) => (s.id === it.id ? it : s)),
+      }));
+    }
+  }
   async function addFlight(f: Omit<Flight, "id">) {
     const item: Flight = { ...f, id: uid("flt") };
     const { error } = await supabase.from("flights").insert(item);
@@ -261,8 +277,10 @@ export default function TripApp() {
           .from("trip-photos")
           .upload(filePath, file);
         if (error) return null;
-        return supabase.storage.from("trip-photos").getPublicUrl(filePath).data
-          .publicUrl;
+        return encodeURI(
+          supabase.storage.from("trip-photos").getPublicUrl(filePath).data
+            .publicUrl
+        );
       })
     );
     setData((d) => ({
@@ -374,7 +392,7 @@ export default function TripApp() {
                       {items.map((it) => (
                         <div
                           key={it.id}
-                          className="p-3 md:p-4 rounded-2xl border flex flex-col md:flex-row md:items-center gap-3"
+                          className="p-3 md:p-4 rounded-2xl border bg-white hover:shadow-md transition flex flex-col md:flex-row md:items-center gap-3"
                         >
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -421,6 +439,7 @@ export default function TripApp() {
                               </div>
                             ) : null}
                           </div>
+                          <EditScheduleDialog item={it} onSave={updateSchedule} />
                         </div>
                       ))}
                     </div>
@@ -741,6 +760,123 @@ function AddScheduleDialog({
               }}
             >
               Add
+            </Button>
+          </DialogTrigger>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function EditScheduleDialog({
+  item,
+  onSave,
+}: {
+  item: ScheduleItem;
+  onSave: (it: ScheduleItem) => void;
+}) {
+  const [area, setArea] = useState<"Barcelona" | "Ibiza">(item.area);
+  const [date, setDate] = useState(item.date);
+  const [time, setTime] = useState(item.time || "");
+  const [title, setTitle] = useState(item.title);
+  const [location, setLocation] = useState(item.location || "");
+  const [address, setAddress] = useState(item.address || "");
+  const [notes, setNotes] = useState(item.notes || "");
+
+  function handleSave(close: () => void) {
+    if (!date || !title) return;
+    onSave({
+      ...item,
+      area,
+      date,
+      time: time || undefined,
+      title,
+      location: location || undefined,
+      address: address || undefined,
+      notes: notes || undefined,
+    });
+    close();
+  }
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 rounded-full"
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[520px]">
+        <DialogHeader>
+          <DialogTitle>Edit schedule item</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <Row label="Area">
+            <Select value={area} onValueChange={(v: "Barcelona" | "Ibiza") => setArea(v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Barcelona">Barcelona</SelectItem>
+                <SelectItem value="Ibiza">Ibiza</SelectItem>
+              </SelectContent>
+            </Select>
+          </Row>
+          <Row label="Date">
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </Row>
+          <Row label="Time">
+            <Input
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+            />
+          </Row>
+          <Row label="Title">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </Row>
+          <Row label="Location">
+            <Input
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+          </Row>
+          <Row label="Address">
+            <Input
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </Row>
+          <Row label="Notes">
+            <Textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </Row>
+        </div>
+        <DialogFooter>
+          <DialogTrigger asChild>
+            <Button variant="secondary">Cancel</Button>
+          </DialogTrigger>
+          <DialogTrigger asChild>
+            <Button
+              className="rounded-2xl"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSave(() => {});
+              }}
+            >
+              Save
             </Button>
           </DialogTrigger>
         </DialogFooter>
