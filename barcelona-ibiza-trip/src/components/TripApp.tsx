@@ -115,6 +115,18 @@ function uid(prefix = "id") {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+const TIME_OPTIONS = Array.from({ length: 24 * 12 }, (_, i) => {
+  const h = Math.floor(i / 12);
+  const m = (i % 12) * 5;
+  const value = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  const label = `${String(hour12).padStart(2, "0")}:${String(m).padStart(
+    2,
+    "0"
+  )} ${h < 12 ? "AM" : "PM"}`;
+  return { value, label };
+});
+
 // ----------------------------
 // Default Data
 // ----------------------------
@@ -723,11 +735,22 @@ function AddScheduleDialog({
             />
           </Row>
           <Row label="Time">
-            <Input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-            />
+            <Select
+              value={time === "" ? "__none" : time}
+              onValueChange={(v) => setTime(v === "__none" ? "" : v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none">No time</SelectItem>
+                {TIME_OPTIONS.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Row>
           <Row label="Title">
             <Input
@@ -846,11 +869,22 @@ function EditScheduleDialog({
             />
           </Row>
           <Row label="Time">
-            <Input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-            />
+            <Select
+              value={time === "" ? "__none" : time}
+              onValueChange={(v) => setTime(v === "__none" ? "" : v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none">No time</SelectItem>
+                {TIME_OPTIONS.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Row>
           <Row label="Title">
             <Input
