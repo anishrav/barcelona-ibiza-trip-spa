@@ -36,7 +36,6 @@ export function AddFlightDialog({
   }
 
   function handleAdd() {
-    if (!traveler || !from || !to || !flight || !date) return;
     onAdd({
       traveler,
       from,
