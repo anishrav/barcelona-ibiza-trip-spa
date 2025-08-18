@@ -719,6 +719,7 @@ function AddScheduleDialog({
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
+              step={300}
             />
           </Row>
           <Row label="Title">
@@ -842,6 +843,7 @@ function EditScheduleDialog({
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
+              step={300}
             />
           </Row>
           <Row label="Title">
