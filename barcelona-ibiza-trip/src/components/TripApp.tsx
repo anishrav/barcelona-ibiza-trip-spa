@@ -132,8 +132,32 @@ const defaultData: TripData = {
         "Carrer del Pica-Soques, 34, 07817 Sant Josep de sa Talaia, Illes Balears, Spain",
     },
   },
-  schedule: [],
-  flights: [],
+  schedule: [
+    // Barcelona
+    { id: uid("sch"), date: "2025-08-30", title: "Night out (drinks)", area: "Barcelona", notes: "Evening" },
+    { id: uid("sch"), date: "2025-08-31", time: "15:15", title: "Sagrada Família Tour", area: "Barcelona", location: "Sagrada Família", address: "Carrer de Mallorca, 401, 08013 Barcelona, Spain" },
+    { id: uid("sch"), date: "2025-08-31", time: "17:00", title: "Fantasy Football Draft", area: "Barcelona", location: "Barcelona Airbnb", address: "Pg. de Gràcia, 65, L'Eixample, 08008 Barcelona, Spain", url: "https://www.airbnb.com/l/ORgNzpnP?s=67&unique_share_id=38225666-7311-4745-ad81-1de9cc3e6db1" },
+    { id: uid("sch"), date: "2025-08-31", time: "20:00", title: "Watch FC Barcelona match at a bar", area: "Barcelona", location: "Bar (TBD)", notes: "After fantasy draft" },
+    { id: uid("sch"), date: "2025-09-01", time: "16:00", title: "Paella Cooking Class", area: "Barcelona", location: "Cooking Class", address: "Carrer de Negrevernís, 30, 08034 Barcelona, Catalonia, Spain" },
+    { id: uid("sch"), date: "2025-09-01", time: "21:30", title: "Flamenco Show @ 23 Robadors", area: "Barcelona", location: "23 Robadors", address: "Carrer d'en Robador, 23, 08001 Barcelona, Spain", url: "https://23robadors.com/", notes: "Programació flamenco — confirm start time on site" },
+    { id: uid("sch"), date: "2025-09-02", time: "13:30", title: "Sailing", area: "Barcelona", location: "Marina", address: "Passeig de Joan de Borbó, 103, 08039 Barcelona, Catalonia, Spain" },
+    { id: uid("sch"), date: "2025-09-02", time: "20:15", title: "Dinner: Bacaro", area: "Barcelona", address: "Carrer de Jerusalem, 6, 08001 Barcelona" },
+    { id: uid("sch"), date: "2025-09-02", time: "22:30", title: "Drinks after dinner", area: "Barcelona", notes: "After Bacaro, late" },
+    { id: uid("sch"), date: "2025-09-03", time: "10:00", title: "Commute to BCN Airport", area: "Barcelona", location: "Barcelona–El Prat (BCN)", address: "Aeropuerto de Barcelona-El Prat, 08820 El Prat de Llobregat, Barcelona, Spain" },
+    { id: uid("sch"), date: "2025-09-03", time: "12:30", title: "Flight: Barcelona → Ibiza (FR3129)", area: "Barcelona", notes: "Arrive 13:40" },
+
+    // Ibiza
+    { id: uid("sch"), date: "2025-09-04", title: "Dinner: Ohana Ibiza", area: "Ibiza" },
+    { id: uid("sch"), date: "2025-09-05", time: "17:00", title: "Calvin Harris @ Ushuaïa", area: "Ibiza", notes: "5–11 pm" },
+    { id: uid("sch"), date: "2025-09-05", time: "23:30", title: "David Guetta @ UNVRS", area: "Ibiza", notes: "11:30 pm – sunrise" },
+    { id: uid("sch"), date: "2025-09-06", title: "Chill day", area: "Ibiza" },
+    { id: uid("sch"), date: "2025-09-07", title: "Fly out", area: "Ibiza" },
+  ],
+  flights: [
+    { id: uid("flt"), traveler: "Anish + Sinha", from: "USA", to: "Barcelona", flight: "DL 128", date: "2025-08-30", arriveTime: "06:00", notes: "Arrive 6:00 am" },
+    { id: uid("flt"), traveler: "Group", from: "Barcelona", to: "Ibiza", flight: "FR 3129", date: "2025-09-03", departTime: "12:30", arriveTime: "13:40", notes: "Ryanair" },
+    { id: uid("flt"), traveler: "Group", from: "Ibiza", to: "Home", flight: "TBD", date: "2025-09-07", notes: "Add details" },
+  ],
   photos: [],
 };
 
@@ -174,7 +198,7 @@ function Row({
 }) {
   return (
     <div className="grid grid-cols-3 gap-3 items-center">
-      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <Label className="text-sm text-muted-foreground">{label}</Label>
       <div className="col-span-2">{children}</div>
     </div>
   );
@@ -258,6 +282,12 @@ export default function TripApp() {
     const { error } = await supabase.from("flights").insert(item);
     if (!error) {
       setData((d) => ({ ...d, flights: [...d.flights, item] }));
+    }
+  }
+  async function deleteFlight(id: string) {
+    const { error } = await supabase.from("flights").delete().eq("id", id);
+    if (!error) {
+      setData((d) => ({ ...d, flights: d.flights.filter((x) => x.id !== id) }));
     }
   }
   async function handlePhotoUpload(files: FileList | null) {
@@ -393,7 +423,7 @@ export default function TripApp() {
                       {items.map((it) => (
                         <div
                           key={it.id}
-                          className="p-3 md:p-4 rounded-2xl border bg-white hover:shadow-md transition flex flex-col md:flex-row md:items-center gap-3"
+                          className="p-3 md:p-4 rounded-2xl border flex flex-col md:flex-row md:items-center gap-3"
                         >
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -440,7 +470,9 @@ export default function TripApp() {
                               </div>
                             ) : null}
                           </div>
-                          <EditScheduleDialog item={it} onSave={updateSchedule} />
+                          <div className="flex items-center gap-2 self-end md:self-center">
+                            <EditScheduleDialog item={it} onSave={updateSchedule} />
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -567,6 +599,7 @@ export default function TripApp() {
                         <th className="p-3">Dep</th>
                         <th className="p-3">Arr</th>
                         <th className="p-3">Notes</th>
+                        <th className="p-3"></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -584,6 +617,9 @@ export default function TripApp() {
                             {f.arriveTime ?? "—"}
                           </td>
                           <td className="p-3">{f.notes ?? ""}</td>
+                          <td className="p-3 text-right">
+                            <DeleteFlightButton onDelete={() => deleteFlight(f.id)} />
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -651,6 +687,7 @@ function AddScheduleDialog({
 }: {
   onAdd: (it: Omit<ScheduleItem, "id">) => void;
 }) {
+  const [open, setOpen] = useState(false);
   const [area, setArea] = useState<"Barcelona" | "Ibiza">("Barcelona");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -669,7 +706,7 @@ function AddScheduleDialog({
     setNotes("");
   }
 
-  function handleAdd(close: () => void) {
+  function handleAdd() {
     if (!date || !title) return;
     onAdd({
       area,
@@ -681,11 +718,11 @@ function AddScheduleDialog({
       notes: notes || undefined,
     });
     clear();
-    close();
+    setOpen(false);
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-2xl">
           <Plus className="h-4 w-4 mr-2" /> Add Item
@@ -736,10 +773,10 @@ function AddScheduleDialog({
             />
           </Row>
           <Row label="Address">
-            <Input
+            <AddressInput
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Street, City"
+              onChange={setAddress}
+              placeholder="Start typing an address..."
             />
           </Row>
           <Row label="Notes">
@@ -751,22 +788,10 @@ function AddScheduleDialog({
           </Row>
         </div>
         <DialogFooter>
-          <DialogTrigger asChild>
-            <Button variant="secondary" onClick={clear}>
-              Cancel
-            </Button>
-          </DialogTrigger>
-          <DialogTrigger asChild>
-            <Button
-              className="rounded-2xl"
-              onClick={(e) => {
-                e.preventDefault();
-                handleAdd(() => {});
-              }}
-            >
-              Add
-            </Button>
-          </DialogTrigger>
+          <Button variant="secondary" onClick={() => { clear(); setOpen(false); }}>
+            Cancel
+          </Button>
+          <Button className="rounded-2xl" onClick={handleAdd}>Add</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -780,6 +805,7 @@ function EditScheduleDialog({
   item: ScheduleItem;
   onSave: (it: ScheduleItem) => void;
 }) {
+  const [open, setOpen] = useState(false);
   const [area, setArea] = useState<"Barcelona" | "Ibiza">(item.area);
   const [date, setDate] = useState(item.date);
   const [time, setTime] = useState(item.time || "");
@@ -788,7 +814,7 @@ function EditScheduleDialog({
   const [address, setAddress] = useState(item.address || "");
   const [notes, setNotes] = useState(item.notes || "");
 
-  function handleSave(close: () => void) {
+  function handleSave() {
     if (!date || !title) return;
     onSave({
       ...item,
@@ -800,11 +826,11 @@ function EditScheduleDialog({
       address: address || undefined,
       notes: notes || undefined,
     });
-    close();
+    setOpen(false);
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="ghost"
@@ -857,9 +883,10 @@ function EditScheduleDialog({
             />
           </Row>
           <Row label="Address">
-            <Input
+            <AddressInput
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={setAddress}
+              placeholder="Start typing an address..."
             />
           </Row>
           <Row label="Notes">
@@ -870,20 +897,8 @@ function EditScheduleDialog({
           </Row>
         </div>
         <DialogFooter>
-          <DialogTrigger asChild>
-            <Button variant="secondary">Cancel</Button>
-          </DialogTrigger>
-          <DialogTrigger asChild>
-            <Button
-              className="rounded-2xl"
-              onClick={(e) => {
-                e.preventDefault();
-                handleSave(() => {});
-              }}
-            >
-              Save
-            </Button>
-          </DialogTrigger>
+          <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button className="rounded-2xl" onClick={handleSave}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -1014,17 +1029,7 @@ function AddFlightDialog({
               Cancel
             </Button>
           </DialogTrigger>
-          <DialogTrigger asChild>
-            <Button
-              className="rounded-2xl"
-              onClick={(e) => {
-                e.preventDefault();
-                handleAdd(() => {});
-              }}
-            >
-              Add
-            </Button>
-          </DialogTrigger>
+          <DialogCloseButton onConfirm={handleAdd}>Add</DialogCloseButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -1041,5 +1046,136 @@ function CopyButton({ text }: { text: string }) {
     >
       <Copy className="h-4 w-4 mr-1" /> Copy
     </Button>
+  );
+}
+
+function DeleteFlightButton({ onDelete }: { onDelete: () => void }) {
+  return (
+    <Button variant="ghost" size="sm" onClick={onDelete}>
+      Remove
+    </Button>
+  );
+}
+
+// Address suggestions for Barcelona and Ibiza
+const ADDRESS_SUGGESTIONS = [
+  // Barcelona
+  "Sagrada Família, Barcelona, Spain",
+  "Park Güell, Barcelona, Spain", 
+  "Las Ramblas, Barcelona, Spain",
+  "Pg. de Gràcia, Barcelona, Spain",
+  "Carrer de Mallorca, Barcelona, Spain",
+  "Plaça Catalunya, Barcelona, Spain",
+  "Gothic Quarter, Barcelona, Spain",
+  "Barceloneta Beach, Barcelona, Spain",
+  "Camp Nou, Barcelona, Spain",
+  "Passeig de Joan de Borbó, Barcelona, Spain",
+  // Ibiza
+  "Playa d'en Bossa, Ibiza, Spain",
+  "San Antonio, Ibiza, Spain", 
+  "Ibiza Town, Ibiza, Spain",
+  "Es Vedra, Ibiza, Spain",
+  "Cala Comte, Ibiza, Spain",
+  "Ushuaïa Ibiza Beach Hotel, Ibiza, Spain",
+  "Pacha Ibiza, Ibiza, Spain",
+  "Amnesia Ibiza, Ibiza, Spain",
+  "DC10 Ibiza, Ibiza, Spain",
+  "Café del Mar, Ibiza, Spain"
+];
+
+function AddressInput({ 
+  value, 
+  onChange, 
+  placeholder = "Start typing an address..." 
+}: { 
+  value: string; 
+  onChange: (value: string) => void; 
+  placeholder?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    onChange(inputValue);
+    
+    if (inputValue.length > 2) {
+      const filtered = ADDRESS_SUGGESTIONS.filter(address =>
+        address.toLowerCase().includes(inputValue.toLowerCase())
+      ).slice(0, 5); // Show max 5 suggestions
+      setFilteredSuggestions(filtered);
+      setIsOpen(filtered.length > 0);
+    } else {
+      setIsOpen(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    onChange(suggestion);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <Input
+        value={value}
+        onChange={handleInputChange}
+        placeholder={placeholder}
+        onFocus={() => {
+          if (value.length > 2 && filteredSuggestions.length > 0) {
+            setIsOpen(true);
+          }
+        }}
+        onBlur={() => {
+          // Delay closing to allow click on suggestions
+          setTimeout(() => setIsOpen(false), 200);
+        }}
+      />
+      {isOpen && filteredSuggestions.length > 0 && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+          {filteredSuggestions.map((suggestion, index) => (
+            <div
+              key={index}
+              className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-900 border-b last:border-b-0"
+              onClick={() => handleSuggestionClick(suggestion)}
+            >
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-gray-400" />
+                <span>{suggestion}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DialogCloseButton({
+  onConfirm,
+  children,
+}: {
+  onConfirm: (close: () => void) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <DialogTrigger asChild>
+      <Button
+        className="rounded-2xl"
+        onClick={(e) => {
+          e.preventDefault();
+          const close = () => {
+            // Find the dialog close button and click it
+            const closeButton = document.querySelector('[data-state="open"] button[aria-label="Close"]');
+            if (closeButton) {
+              (closeButton as HTMLElement).click();
+            }
+          };
+          onConfirm(close);
+        }}
+      >
+        {children}
+      </Button>
+    </DialogTrigger>
   );
 }
