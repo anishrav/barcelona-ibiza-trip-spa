@@ -59,7 +59,7 @@ export default function TripApp() {
     
     data.flights.forEach(flight => {
       // Arrival flights (8/29 or 8/30 departure, but always show arrival on 8/30)
-      if ((flight.date === "2025-08-29" || flight.date === "2025-08-30") && flight.arrivetime) {
+      if ((flight.date === "2025-08-29" || flight.date === "2025-08-30") && flight.arrivetime && flight.to == "BCN") {
         items.push({
           id: `flight-arrival-${flight.id}`,
           date: "2025-08-30", // Always show arrival on Aug 30
@@ -73,7 +73,7 @@ export default function TripApp() {
       }
       
       // Departure on Sep 7
-      if (flight.date === "2025-09-07" && flight.departtime) {
+      if (flight.date === "2025-09-07" && flight.departtime && flight.from == "IBZ") {
         items.push({
           id: `flight-departure-${flight.id}`,
           date: flight.date,
