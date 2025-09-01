@@ -43,3 +43,15 @@ export function groupByDate(items: ScheduleItem[]) {
 export function uid(prefix = "id") {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
 }
+
+export function isUpcoming(it: ScheduleItem, now: Date = new Date()) {
+  const today = now.toISOString().slice(0, 10);
+  if (it.date > today) return true;
+  if (it.date < today) return false;
+
+  if (!it.time) return true;
+  const [h, m] = it.time.split(":").map(Number);
+  const itemTime = new Date(now);
+  itemTime.setHours(h, m, 0, 0);
+  return itemTime >= now;
+}

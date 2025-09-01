@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Calendar, ExternalLink, Home, MapPin, Plane, Image } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { TripData, ScheduleItem, Flight } from "@/types/trip";
-import { mapLink, formatTime, formatDT, byDateTime, groupByDate, uid } from "@/utils/trip-utils";
+import { mapLink, formatTime, formatDT, byDateTime, groupByDate, uid, isUpcoming } from "@/utils/trip-utils";
 import { SectionHeader, Badge } from "@/components/ui/SectionHeader";
 import { AddScheduleDialog } from "@/components/dialogs/AddScheduleDialog";
 import { EditScheduleDialog } from "@/components/dialogs/EditScheduleDialog";
@@ -91,8 +91,10 @@ export default function TripApp() {
   }, [data.flights]);
 
   const scheduleSorted = useMemo(() => {
-    // Combine actual schedule with virtual flight schedule items
-    const combined = [...data.schedule, ...flightScheduleItems].sort(byDateTime);
+    const now = new Date();
+    const combined = [...data.schedule, ...flightScheduleItems]
+      .filter((s) => isUpcoming(s, now))
+      .sort(byDateTime);
     return areaFilter === "All" ? combined : combined.filter((s) => s.area === areaFilter);
   }, [data.schedule, flightScheduleItems, areaFilter]);
 
